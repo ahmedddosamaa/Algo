@@ -54,7 +54,7 @@ def worstfitlinear(file_durations, folder_capacity=100):
         total_duration = sum(duration for _, duration in folder)
         for file, duration in folder:
             print(f"  {file}: {duration}s")
-        print(f"  Total Duration: {total_duration}s\n")
+        print(f"  Total Duration: {total_duration}s\8n")
 
     #metadata
     with open('worstfitlinear.txt', 'w') as f:
@@ -88,6 +88,38 @@ def worstfitqueue(file_durations, folder_capacity=100):
         for i, folder in enumerate(newfolder, 1):
             f.write(f"Folder {i}: {folder}s\n")
 
+def first_fit (file_durations, folder_capacity=100):
+    folders = [] #initiate a list of folders to store files
+    file_durations.sort(key=lambda x: x[1], reverse = True) #sort the files in descending order
+    for file, duration in file_durations :#for loop that lookds through FOLDERS
+        placed = False #not placed yet
+        for folder in folders: #for loop that looks through FILES
+            remaining_space = folder_capacity - sum(d for _, d in folder) #calculate the remaining space for the folder on this iteration
+            if remaining_space >= duration: #if there's space in the folder & it fits the file
+                folder.append((file, duration)) #adding file to folder
+                placed = True #turn placed flag to true
+                break
+        if not placed:
+            folders.append([(file, duration)]) #create a new folder
+
+    print("\nFirst Fit Decreasing Algorithm:")
+    for i, folder in enumerate(folders, 1):
+        total_duration = sum(duration for _, duration in folder)
+        print(f"Folder {i}:")
+        for file, duration in folder:
+            print(f"  {file}: {duration}s")
+        print(f"  Total Duration: {total_duration}s\n")
+
+    # Save metadata to a file
+    metadata_file_path = 'firstfitdecreasing.txt'
+    with open(metadata_file_path, 'w') as f:
+        for i, folder in enumerate(folders, 1):
+            total_duration = sum(duration for _, duration in folder)
+            f.write(f"Folder {i}:\n")
+            for file, duration in folder:
+                f.write(f"  {file}: {duration}s\n")
+            f.write(f"  Total Duration: {total_duration}s\n\n")
+
 
 #mn awl hena el main
 def main():
@@ -108,14 +140,17 @@ def main():
             print("\nChoose an Algorithm to run:")
             print("1. Worst fit linear search")
             print("2. Worst fit priority queue")
-
-            choice = int(input("Enter your choice (1 or 2): "))
+            print("3. First fit")
+            choice = int(input("Enter your choice: "))
             folder_capacity = 100
 
             if choice == 1:
                 worstfitlinear(file_durations, folder_capacity)
             elif choice == 2:
                 worstfitqueue(file_durations, folder_capacity)
+            elif choice == 3:
+                first_fit(file_durations, folder_capacity)
+
 
             another_algo = input("\nDo you want to use another algorithm? (yes/no): ").lower()
             if another_algo != "yes":
